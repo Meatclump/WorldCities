@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using WorldCities01.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<WorldCities01Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("WorldCities01Context") ?? throw new InvalidOperationException("Connection string 'WorldCities01Context' not found.")));
 
 // Add services to the container.
 
