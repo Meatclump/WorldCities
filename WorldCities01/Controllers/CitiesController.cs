@@ -25,7 +25,9 @@ namespace WorldCities01.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<City>>> GetCity()
         {
-            return await _context.City.ToListAsync();
+            List<City> cities = await _context.City.ToListAsync();
+            var orderedCities = cities.OrderByDescending(city => city.Population);
+            return orderedCities.ToList();
         }
 
         // GET: api/Cities/5
@@ -42,6 +44,7 @@ namespace WorldCities01.Controllers
             return city;
         }
 
+        // POST: api/Cities
         [HttpPost]
         public async Task<IActionResult> PostCity(string name, string country, int population)
         {
@@ -54,6 +57,40 @@ namespace WorldCities01.Controllers
             _context.City.Add(city);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetCity", new { id = city.CityId }, city);
+        }
+
+        // POST: api/Cities/5
+        [HttpPost("{id}")]
+        public async Task<IActionResult> PostCity(int id, string name = "", string country = "", int population = 0)
+        {
+            var city = await _context.City.FindAsync(id);
+            if (city == null)
+            {
+                return NotFound();
+            }
+            if (name != "")
+                city.Name = name;
+            if (country != "")
+                city.Country = country;
+            if (population >= 0)
+                city.Population = population;
+            _context.Entry(city).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CityExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
         }
 
         private bool CityExists(int id)
