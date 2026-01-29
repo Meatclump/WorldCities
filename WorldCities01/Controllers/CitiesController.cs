@@ -42,62 +42,18 @@ namespace WorldCities01.Controllers
             return city;
         }
 
-        // PUT: api/Cities/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCity(int id, City city)
-        {
-            if (id != city.CityId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(city).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Cities
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<City>> PostCity(City city)
+        public async Task<IActionResult> PostCity(string name, string country, int population)
         {
+            var city = new City
+            {
+                Name = name,
+                Country = country,
+                Population = population
+            };
             _context.City.Add(city);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetCity", new { id = city.CityId }, city);
-        }
-
-        // DELETE: api/Cities/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCity(int id)
-        {
-            var city = await _context.City.FindAsync(id);
-            if (city == null)
-            {
-                return NotFound();
-            }
-
-            _context.City.Remove(city);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool CityExists(int id)
