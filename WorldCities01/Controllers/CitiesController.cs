@@ -21,7 +21,7 @@ namespace WorldCities01.Controllers
             _context = context;
         }
 
-        // GET: api/Cities
+        // GET: api/Cities - Return list of cities ordered by population descending
         [HttpGet]
         public async Task<ActionResult<IEnumerable<City>>> GetCity()
         {
@@ -30,7 +30,7 @@ namespace WorldCities01.Controllers
             return orderedCities.ToList();
         }
 
-        // GET: api/Cities/5
+        // GET: api/Cities/5 - Return city by id
         [HttpGet("{id}")]
         public async Task<ActionResult<City>> GetCity(int id)
         {
@@ -44,7 +44,7 @@ namespace WorldCities01.Controllers
             return city;
         }
 
-        // POST: api/Cities
+        // POST: api/Cities - Create a new city
         [HttpPost]
         public async Task<IActionResult> PostCity(string name, string country, int population)
         {
@@ -59,7 +59,7 @@ namespace WorldCities01.Controllers
             return CreatedAtAction("GetCity", new { id = city.CityId }, city);
         }
 
-        // POST: api/Cities/5
+        // POST: api/Cities/5 - Update an existing city
         [HttpPost("{id}")]
         public async Task<IActionResult> PostCity(int id, string name = "", string country = "", int population = 0)
         {
@@ -86,6 +86,30 @@ namespace WorldCities01.Controllers
                     return NotFound();
                 }
                 else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+
+        // POST: api/Cities/Delete/5 - Delete a city
+        [HttpPost("Delete/{id}")]
+        public async Task<IActionResult> PostDelete(int id)
+        {
+            City city = await _context.City.FindAsync(id);
+            if (city == null)
+                return NotFound();
+            _context.Remove(city);
+            try
+            {
+                await _context.SaveChangesAsync();
+            } catch (DbUpdateConcurrencyException)
+            {
+                if (!CityExists(id))
+                {
+                    return NotFound();
+                } else
                 {
                     throw;
                 }
